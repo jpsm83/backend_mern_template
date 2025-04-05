@@ -35,9 +35,11 @@ app.use('/', express.static(path.join(__dirname, 'public')))
 // 1 - route for html pages (404, index, etc.)
 app.use('/', require('./routes/root'))
 
-app.use('/auth', require('./routes/authRoutes'))
-app.use('/users', require('./routes/userRoutes'))
-app.use('/notes', require('./routes/noteRoutes'))
+app.use('/api/v1/auth', require('./routes/authRoutes'))
+
+// model routes
+app.use('/api/v1/users', require('./routes/userRoutes'))
+app.use('/api/v1/notes', require('./routes/noteRoutes'))
 
 // single threaded process, if route 1 (above) does not match, everything else will be handled by this route
 app.all('*', (req, res) => {
@@ -58,6 +60,7 @@ mongoose.connection.once('open', () => {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 })
 
+// if error occurs while connecting to MongoDB, log the error, exit the process and save the error to a log file
 mongoose.connection.on('error', err => {
     console.log(err)
     logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log')
